@@ -1,2 +1,3 @@
 # python_jenkins
-python调用jenkins进行任务的构建
+
+小脚本，用于简单jenkins任务的构建
