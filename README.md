@@ -1,0 +1,2 @@
+# python_jenkins
+python调用jenkins进行任务的构建
