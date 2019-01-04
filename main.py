@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-import jenkins,time,sys
+import jenkins,time,sys,requests
 
-server = jenkins.Jenkins(jenkins_url, username="", password="")
+server = jenkins.Jenkins("url", username="admin", password="")
 job_group = server.get_all_jobs()
 first_loop = True
 parameter_dict = {}
@@ -35,6 +35,9 @@ while True:
             elif run_sure == "b":
                 first_loop = True
                 continue
+            else:
+                first_loop = True
+                continue
         elif len(job_property) == 2:
             job_parameter = job_property[1]["parameterDefinitions"]
             for parameter_num in range(len(job_parameter)):
@@ -51,6 +54,10 @@ while True:
                 parameter_dict.clear()
                 continue
             elif job_sure == "b":
+                parameter_dict.clear()
+                first_loop = True
+                continue
+            else:
                 parameter_dict.clear()
                 first_loop = True
                 continue
@@ -89,4 +96,12 @@ while True:
                 sys.exit(0)
     except (KeyboardInterrupt,EOFError):
         print("")
+        parameter_dict.clear()
+        first_loop = True
+        continue
+    except (requests.exceptions.ConnectionError):
+        print("")
+        print("## 服务端失去响应，需重跑任务")
+        parameter_dict.clear()
+        first_loop = True
         continue
