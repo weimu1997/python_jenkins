@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-import jenkins,time,sys,requests
+import jenkins
+import time
+import sys
+import requests
 
-server = jenkins.Jenkins("url", username="admin", password="")
+server = jenkins.Jenkins("url", username="user", password="passwd")
 job_group = server.get_all_jobs()
 first_loop = True
 parameter_dict = {}
@@ -11,8 +14,8 @@ while True:
         if first_loop == True:
             print("=======================")
             print("## 任务列表如下: ")
-            for list_num,list_value in enumerate(job_group):
-                print("%02d) %s" % (list_num+1,job_group[list_num]["name"]))
+            for list_num, list_value in enumerate(job_group):
+                print("%02d) %s" % (list_num + 1, job_group[list_num]["name"]))
             job_select = input("## 输入 数字 选择任务: ").strip()
             if job_select == "q":
                 sys.exit(0)
@@ -22,7 +25,7 @@ while True:
                 continue
             if job_selectnum > len(job_group):
                 continue
-            job_name = job_group[job_selectnum-1]["name"]
+            job_name = job_group[job_selectnum - 1]["name"]
             job_lastbuildnum = server.get_job_info(job_name)["nextBuildNumber"]
             first_loop = False
         print("=======================")
@@ -41,15 +44,17 @@ while True:
         elif len(job_property) == 2:
             job_parameter = job_property[1]["parameterDefinitions"]
             for parameter_num in range(len(job_parameter)):
-                parameter_dict_key = input("## 请输入对应的参数 " + job_parameter[parameter_num]["name"] + job_parameter[parameter_num]["description"])
-                parameter_dict[job_parameter[parameter_num]["name"]] = parameter_dict_key
-            print("## 确认参数:",end="",flush=True)
-            for key,value in parameter_dict.items():
-                print(" %s ==> %s  " % (key,value),end="",flush=True)
+                parameter_dict_key = input("## 请输入对应的参数 " + job_parameter[parameter_num][
+                                           "name"] + job_parameter[parameter_num]["description"])
+                parameter_dict[job_parameter[parameter_num]
+                               ["name"]] = parameter_dict_key
+            print("## 确认参数:", end="", flush=True)
+            for key, value in parameter_dict.items():
+                print(" %s ==> %s  " % (key, value), end="", flush=True)
             print("")
             job_sure = input("## 输入 y 确认执行，n 重新输入参数，b 重新选择任务: ")
             if job_sure == "y":
-                server.build_job(job_name,parameter_dict)
+                server.build_job(job_name, parameter_dict)
             elif job_sure == "n":
                 parameter_dict.clear()
                 continue
@@ -62,20 +67,22 @@ while True:
                 first_loop = True
                 continue
         print("=======================")
-        print("## 等待服务端响应中 ",end="",flush=True)
+        print("## 等待服务端响应中 ", end="", flush=True)
         time.sleep(1)
         for i in range(5):
-            print(".",end="",flush=True)
+            print(".", end="", flush=True)
             time.sleep(2)
-        print("",flush=True)
+        print("", flush=True)
         time.sleep(1)
         print("## 打印服务端响应: ")
         time.sleep(1)
         print("=======================")
         time.sleep(1)
-        job_buildoutput = server.get_build_console_output(job_name,job_lastbuildnum)
+        job_buildoutput = server.get_build_console_output(
+            job_name, job_lastbuildnum)
         print(job_buildoutput)
-        job_buildresult = server.get_build_info(job_name,job_lastbuildnum)["result"]
+        job_buildresult = server.get_build_info(
+            job_name, job_lastbuildnum)["result"]
         print("=======================")
         if job_buildresult == "SUCCESS":
             job_continue_whensuccess = input("## 执行成功！输入 y 继续执行任务，q 退出脚本: ")
@@ -94,7 +101,7 @@ while True:
                 continue
             else:
                 sys.exit(0)
-    except (KeyboardInterrupt,EOFError):
+    except (KeyboardInterrupt, EOFError):
         print("")
         parameter_dict.clear()
         first_loop = True
